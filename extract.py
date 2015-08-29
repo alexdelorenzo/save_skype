@@ -4,12 +4,12 @@ from collections import namedtuple, defaultdict
 from os import getcwd, chdir
 import sqlite3
 
-
 try:
     import click
 
 except ImportError as ex:
     raise ImportError("Please install click via pip") from ex
+
 
 MAX_FILENAME_LENGTH = 60
 COL_SQL = "PRAGMA table_info(Messages);"
@@ -66,6 +66,7 @@ class Chat(namedtuple('Chat', 'users msgs id')):
             file.write(str(self))
 
         return filename
+
 
 def get_skype_map(path: str) -> defaultdict:
     skype_map = defaultdict(list)
