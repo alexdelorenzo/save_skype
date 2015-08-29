@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from collections import namedtuple, defaultdict
-from collections import namedtuple
 from os import getcwd, chdir
 import sqlite3
 
@@ -12,14 +11,14 @@ try:
 except ImportError as ex:
     raise ImportError("Please install click via pip") from ex
 
-
+MAX_FILENAME_LENGTH = 60
 COL_SQL = "PRAGMA table_info(Messages);"
 MSG_SQL = "select * from Messages;"
 
 
 class Message(namedtuple('Message', 'user msg')):
     def __str__(self):
-        return ': '.join((str(self.user), str(self.msg)))
+        return '%s: %s' % (str(self.user), str(self.msg))
 
 
 class Chat(namedtuple('Chat', 'users msgs id')):
@@ -59,7 +58,7 @@ class Chat(namedtuple('Chat', 'users msgs id')):
     def __iter__(self):
         return iter(self.msgs)
 
-    def save(self, filename: str=None, max_length=60) -> str:
+    def save(self, filename: str=None, max_length=MAX_FILENAME_LENGTH) -> str:
         users = '_'.join(self.users)
         filename = (filename if filename else "chat_%s_%s" % (hash(self), users))[:max_length] + '.txt'
         
@@ -68,7 +67,7 @@ class Chat(namedtuple('Chat', 'users msgs id')):
 
         return filename
 
-def get_skype_map(path: str) -> dict:
+def get_skype_map(path: str) -> defaultdict:
     skype_map = defaultdict(list)
 
     with sqlite3.connect(path) as connection:
@@ -99,7 +98,7 @@ def get_skype_chats(path: str) -> iter:
 @click.argument("file")
 def chats_to_files(file: str=None, save: str='.'):
     if not file:
-        raise ValueError("Skype main.db not found")
+        raise ValueError("Skype main.db location not supplied.")
 
     cwd = getcwd()
     chdir(save)
@@ -110,6 +109,7 @@ def chats_to_files(file: str=None, save: str='.'):
     print("Files saved to %s" % save)
 
     chdir(cwd)
+
 
 if __name__ == "__main__":
     chats_to_files()
