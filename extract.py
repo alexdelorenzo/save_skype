@@ -79,9 +79,9 @@ def get_skype_map(path: str) -> defaultdict:
         
         rows = cursor.execute(MSG_SQL).fetchall()
 
-        for row in rows:
-            row = Row(*row)
-            skype_map[row.convo_id].append(row)
+    for row in rows:
+        row = Row(*row)
+        skype_map[row.convo_id].append(row)
 
     return skype_map
 
