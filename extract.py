@@ -22,7 +22,7 @@ class Message(namedtuple('Message', 'user msg')):
 
 
 class Chat(namedtuple('Chat', 'users msgs id')):
-    def __new__(cls, msgs: iter, id: int=None):
+    def __new__(cls, msgs: tuple, id: int=None):
         users = sorted({msg.user for msg in msgs})
 
         return super().__new__(cls, users, msgs, id)
@@ -42,7 +42,7 @@ class Chat(namedtuple('Chat', 'users msgs id')):
     def __iter__(self):
         return iter(self.msgs)
 
-    def save(self, filename: str=None, max_length=MAX_FILENAME_LENGTH) -> str:
+    def save(self, filename: str=None, max_length: int=MAX_FILENAME_LENGTH) -> str:
         users = '_'.join(self.users)
         filename = (filename if filename else "chat_%s_%s" % (hash(self), users))[:max_length] + '.txt'
         
