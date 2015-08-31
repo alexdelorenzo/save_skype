@@ -36,22 +36,6 @@ class Chat(namedtuple('Chat', 'users msgs id')):
              len(self.msgs),
              ', '.join(self.users))
 
-    def __cmp__(self, other):
-        if not isinstance(other, Chat) or \
-             self.id is None or \
-             other.id is None:
-
-            return super().__cmp__(other)
-
-        elif self.id < other.id:
-            return -1
-
-        elif self.id == other.id:
-            return 0
-
-        elif self.id > other.id:
-            return 1
-
     def __hash__(self):
         return hash(str(self)) if self.id is None else self.id
 
@@ -78,7 +62,7 @@ def get_skype_map(path: str) -> defaultdict:
         rows = cursor.execute(MSG_SQL).fetchall()
     
     Row = namedtuple("Row", fields)
-    
+
     for row in rows:
         row = Row(*row)
         skype_map[row.convo_id].append(row)
