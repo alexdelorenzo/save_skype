@@ -53,8 +53,6 @@ class Chat(namedtuple('Chat', 'users msgs id')):
 
 
 def get_skype_map(path: str) -> defaultdict:
-    skype_map = defaultdict(list)
-
     with sqlite3.connect(path) as connection:
         cursor = connection.cursor()
         col_info = cursor.execute(COL_SQL)
@@ -62,6 +60,7 @@ def get_skype_map(path: str) -> defaultdict:
         rows = cursor.execute(MSG_SQL).fetchall()
     
     Row = namedtuple("Row", fields)
+    skype_map = defaultdict(list)
 
     for row in rows:
         row = Row(*row)
