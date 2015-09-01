@@ -64,7 +64,7 @@ class Chat(namedtuple('Chat', 'users msgs id')):
 
 
 def get_skype_map(path: str) -> defaultdict:
-    with sqlite3.connect(path) as connection:
+    with connect(path) as connection:
         cursor = connection.cursor()
         col_info = cursor.execute(COL_SQL)
         fields = [info[1] for info in col_info.fetchall()]
