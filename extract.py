@@ -99,10 +99,10 @@ def chats_to_files(file: str=None, save: str='.'):
     cwd = getcwd()
     chdir(save)
 
-    for chat in gen_skype_chats(file):
+    for count, chat in enumerate(gen_skype_chats(file)):
         print(chat.save())
 
-    print("Files saved to %s" % save)
+    print("%s files saved to %s" % (count + 1, save))
 
     chdir(cwd)
 

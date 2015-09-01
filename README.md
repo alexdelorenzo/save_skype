@@ -3,14 +3,14 @@ Extract chats from Skype main.db and save them as text files
 
 Python 3 only
 
-# Installation
+## Installation
 - Pull the repo
 - Install dependencies w/ pip
 `pip install -r requirements.txt`
 - `chmod +x extract.py`
 
 
-# Usage
+## Usage
 - Get the path of your main.db
 `~/.Skype/USERNAME/main.db`
 
