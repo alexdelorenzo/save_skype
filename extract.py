@@ -70,6 +70,7 @@ def get_skype_map(path: str) -> defaultdict:
         fields = [info[1] for info in col_info.fetchall()]
         rows = cursor.execute(MSG_SQL).fetchall()
     
+    # TODO: just write the SQL that makes all of this unnecessary
     Row = namedtuple("Row", fields)
     skype_map = defaultdict(list)
 
@@ -79,7 +80,7 @@ def get_skype_map(path: str) -> defaultdict:
 
     return skype_map
 
-def get_skype_chats(path: str) -> GeneratorType:
+def gen_skype_chats(path: str) -> GeneratorType:
     skype_map = get_skype_map(path)
 
     for chat_id, msgs in skype_map.items():
@@ -98,7 +99,7 @@ def chats_to_files(file: str=None, save: str='.'):
     cwd = getcwd()
     chdir(save)
 
-    for chat in get_skype_chats(file):
+    for chat in gen_skype_chats(file):
         print(chat.save())
 
     print("Files saved to %s" % save)
