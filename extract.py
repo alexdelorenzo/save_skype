@@ -55,7 +55,7 @@ class Chat(namedtuple('Chat', 'users msgs id')):
         if not filename:
             filename = CHAT_FMT % (hash(self), users)
 
-        filename = filename[:max_length]
+        filename = filename[:max_length] + EXT
         
         with open(filename, 'w') as file:
             file.write(str(self))
