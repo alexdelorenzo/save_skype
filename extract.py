@@ -2,7 +2,8 @@
 
 from collections import namedtuple, defaultdict
 from os import getcwd, chdir
-import sqlite3
+from sqlite3 import connect
+from types import GeneratorType
 
 try:
     import click
@@ -11,8 +12,13 @@ except ImportError as ex:
     raise ImportError("Please install click via pip") from ex
 
 
-MAX_FILENAME_LENGTH = 60
-COL_SQL = "PRAGMA table_info(Messages);"
+# Filename params
+MAX_NAME_LEN = 60
+CHAT_FMT = "chat_%s_%s"
+EXT = ".txt"
+
+# SQL statements
+COL_SQL = "PRAGMA table_info(Messages);"  # grabs column names 
 MSG_SQL = "select * from Messages;"
 
 
@@ -31,10 +37,11 @@ class Chat(namedtuple('Chat', 'users msgs id')):
         return '\n'.join(map(str, self))
 
     def __repr__(self):
-        return "<Chat #%s with %s messages by %s>" % \
-            (self.id if self.id else '?',
-             len(self.msgs),
-             ', '.join(self.users))
+        chat_id = self.id if self.id else '?'
+        msgs = len(self.msgs)
+        users = ', '.join(self.users)
+
+        return "<Chat #%s with %s messages by %s>" % (chat_id, msgs, users)
 
     def __hash__(self):
         return hash(str(self)) if self.id is None else self.id
@@ -42,9 +49,13 @@ class Chat(namedtuple('Chat', 'users msgs id')):
     def __iter__(self):
         return iter(self.msgs)
 
-    def save(self, filename: str=None, max_length: int=MAX_FILENAME_LENGTH) -> str:
+    def save(self, filename: str=None, max_length: int=MAX_NAME_LEN) -> str:
         users = '_'.join(self.users)
-        filename = (filename if filename else "chat_%s_%s" % (hash(self), users))[:max_length] + '.txt'
+
+        if not filename:
+            filename = CHAT_FMT % (hash(self), users)
+
+        filename = filename[:max_length]
         
         with open(filename, 'w') as file:
             file.write(str(self))
@@ -68,7 +79,7 @@ def get_skype_map(path: str) -> defaultdict:
 
     return skype_map
 
-def get_skype_chats(path: str) -> iter:
+def get_skype_chats(path: str) -> GeneratorType:
     skype_map = get_skype_map(path)
 
     for chat_id, msgs in skype_map.items():
@@ -82,7 +93,7 @@ def get_skype_chats(path: str) -> iter:
 @click.argument("file")
 def chats_to_files(file: str=None, save: str='.'):
     if not file:
-        raise ValueError("Skype main.db location not supplied.")
+        raise OSError("Skype main.db location not supplied.")
 
     cwd = getcwd()
     chdir(save)
@@ -97,4 +108,3 @@ def chats_to_files(file: str=None, save: str='.'):
 
 if __name__ == "__main__":
     chats_to_files()
-
