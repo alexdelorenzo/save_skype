@@ -97,14 +97,18 @@ def chats_to_files(file: str=None, save: str='.'):
         raise OSError("Skype main.db location not supplied.")
 
     cwd = getcwd()
-    chdir(save)
+    
+    # ALWAYS go back to the current working dir
+    try:
+        chdir(save)
+    
+        for count, chat in enumerate(gen_skype_chats(file)):
+            print(chat.save())
 
-    for count, chat in enumerate(gen_skype_chats(file)):
-        print(chat.save())
-
-    print("%s files saved to %s" % (count + 1, save))
-
-    chdir(cwd)
+        print("%s files saved to %s" % (count + 1, save))
+        
+    finally:
+        chdir(cwd)
 
 
 if __name__ == "__main__":
