@@ -63,19 +63,25 @@ class Chat(namedtuple('Chat', 'users msgs id')):
         return filename
 
 
-def get_skype_map(path: str) -> defaultdict:
+def gen_rows(path: str) -> GeneratorType:
     with connect(path) as connection:
         cursor = connection.cursor()
         col_info = cursor.execute(COL_SQL)
         fields = [info[1] for info in col_info.fetchall()]
         rows = cursor.execute(MSG_SQL).fetchall()
     
-    # TODO: just write the SQL that makes all of this unnecessary
     Row = namedtuple("Row", fields)
+    
+    for row in rows:
+        yield Row(*row)
+
+
+def get_skype_map(path: str) -> defaultdict:
+    # TODO: just write the SQL that makes all of this unnecessary
+    row_gen = gen_rows(path)
     skype_map = defaultdict(list)
 
-    for row in rows:
-        row = Row(*row)
+    for row in row_gen:
         skype_map[row.convo_id].append(row)
 
     return skype_map
