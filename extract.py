@@ -4,6 +4,7 @@ from collections import namedtuple, defaultdict
 from os import getcwd, chdir
 from sqlite3 import connect
 from types import GeneratorType
+from datetime import datetime
 
 try:
     import click
@@ -18,13 +19,14 @@ CHAT_FMT = "chat_%s_%s"
 EXT = ".txt"
 
 # SQL statements
-COL_SQL = "PRAGMA table_info(Messages);"  # grabs column names 
+COL_SQL = "PRAGMA table_info(Messages);"  # grabs column names
 MSG_SQL = "select * from Messages;"
 
 
-class Message(namedtuple('Message', 'user msg')):
+class Message(namedtuple('Message', 'timestamp user msg')):
     def __str__(self):
-        return '%s: %s' % (str(self.user), str(self.msg))
+        dt = datetime.fromtimestamp(self.timestamp)
+        return '[%s] %s: %s' % (str(dt), str(self.user), str(self.msg))
 
 
 class Chat(namedtuple('Chat', 'users msgs id')):
@@ -56,7 +58,7 @@ class Chat(namedtuple('Chat', 'users msgs id')):
             filename = CHAT_FMT % (hash(self), users)
 
         filename = filename[:max_length] + EXT
-        
+
         with open(filename, 'w') as file:
             file.write(str(self))
 
@@ -69,9 +71,9 @@ def gen_rows(path: str) -> GeneratorType:
         col_info = cursor.execute(COL_SQL)
         fields = [info[1] for info in col_info.fetchall()]
         rows = cursor.execute(MSG_SQL).fetchall()
-    
+
     Row = namedtuple("Row", fields)
-    
+
     for row in rows:
         yield Row(*row)
 
@@ -90,7 +92,7 @@ def gen_skype_chats(path: str) -> GeneratorType:
     skype_map = get_skype_map(path)
 
     for chat_id, msgs in skype_map.items():
-        msg_objs = tuple(Message(row.author, row.body_xml) 
+        msg_objs = tuple(Message(row.timestamp, row.author, row.body_xml)
                          for row in msgs)
 
         yield Chat(msg_objs, chat_id)
@@ -103,16 +105,16 @@ def chats_to_files(file: str=None, save: str='.'):
         raise OSError("Skype main.db location not supplied.")
 
     cwd = getcwd()
-    
+
     # ALWAYS go back to the current working dir
     try:
         chdir(save)
-    
+
         for count, chat in enumerate(gen_skype_chats(file)):
             print(chat.save())
 
         print("%s files saved to %s" % (count + 1, save))
-        
+
     finally:
         chdir(cwd)
 
