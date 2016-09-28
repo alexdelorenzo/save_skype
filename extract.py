@@ -6,6 +6,8 @@ from sqlite3 import connect
 from types import GeneratorType
 from datetime import datetime
 
+from format import format_msg
+
 try:
     import click
 
@@ -88,14 +90,16 @@ def get_skype_map(path: str) -> defaultdict:
 
     return skype_map
 
+
 def gen_skype_chats(path: str) -> GeneratorType:
     skype_map = get_skype_map(path)
 
     for chat_id, msgs in skype_map.items():
-        msg_objs = tuple(Message(row.timestamp, row.author, row.body_xml)
+        msg_objs = tuple(Message(row.timestamp, row.author, format_msg(row.body_xml))
                          for row in msgs)
 
         yield Chat(msg_objs, chat_id)
+
 
 @click.command()
 @click.option("-s", "--save", default='.', help="Path to save chats")
