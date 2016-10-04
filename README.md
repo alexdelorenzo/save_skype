@@ -6,7 +6,7 @@ Python 3 only
 ## Installation
 - Pull the repo
 - Install dependencies w/ pip
-`pip install -r requirements.txt`
+`pip3 install -r requirements.txt`
 - `chmod +x extract.py`
 
 
