@@ -30,4 +30,7 @@ chat_2057_me_other4.txt
 ...
 
 Files saved to .
+
+# License
+See `LICENSE`
 ```
