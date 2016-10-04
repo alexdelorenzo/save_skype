@@ -7,6 +7,7 @@ except ImportError as ex:
 
 SEC_IN_MIN = 60
 MIN_IN_HR = 60
+NO_MSG_CONTENT = "<NO_MESSAGE_CONTENT>"
 
 
 def fmt_duration(sec: HtmlWrapper) -> str:
@@ -31,7 +32,7 @@ def get_duration_str(part: HtmlWrapper) -> str:
 
 def format_msg(msg: str) -> str:
     if msg is None:
-        return msg
+        return NO_MSG_CONTENT
 
     if '</' in msg:
         wrapped = HtmlWrapper(msg)

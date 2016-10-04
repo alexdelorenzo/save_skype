@@ -27,6 +27,7 @@ MSG_SQL = "select * from Messages;"
 # Format strings
 MSG_FMT = "[%s] %s: %s"
 CHAT_FMT = "<Chat #%s with %s messages by %s>"
+DEFAULT_CHAT_ID = "?"
 
 
 class Message(namedtuple('Message', 'timestamp user msg')):
@@ -50,7 +51,7 @@ class Chat(namedtuple('Chat', 'users msgs id')):
         return '\n'.join(map(str, self))
 
     def __repr__(self):
-        chat_id = self.id if self.id is None else '?'
+        chat_id = DEFAULT_CHAT_ID if self.id is None else self.id
         msgs = len(self.msgs)
         users = ', '.join(self.users)
 
