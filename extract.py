@@ -126,10 +126,11 @@ def chats_to_files(file: str=None, save: str='.'):
     try:
         chdir(save)
 
-        for count, chat in enumerate(gen_skype_chats(file)):
+        file_count = 0
+        for file_count, chat in enumerate(gen_skype_chats(file), start=1):
             print(chat.save())
 
-        print("%s files saved to %s" % (count + 1, save))
+        print("%s files saved to %s" % (file_count, save))
 
     finally:
         chdir(cwd)

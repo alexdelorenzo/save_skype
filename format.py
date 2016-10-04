@@ -1,7 +1,7 @@
 from html_wrapper import HtmlWrapper
 
 
-def duration(sec: HtmlWrapper) -> str:
+def fmt_duration(sec: HtmlWrapper) -> str:
     if sec is None:
         return '0s'
 
@@ -17,8 +17,8 @@ def duration(sec: HtmlWrapper) -> str:
     return ' '.join(string for string in (h_str, m_str, s_str) if string)
 
 
-def duration_str(part: HtmlWrapper) -> str:
-    return "%s's call duration %s." % (part['identity'], duration(part.duration))
+def get_duration_str(part: HtmlWrapper) -> str:
+    return "%s's call duration %s." % (part['identity'], fmt_duration(part.duration))
 
 
 def format_msg(msg: str) -> str:
@@ -30,7 +30,7 @@ def format_msg(msg: str) -> str:
         part_tags = wrapped.find_all('part')
 
         if part_tags:
-            return '\n'.join(map(duration_str, part_tags))
+            return '\n'.join(map(get_duration_str, part_tags))
 
         return wrapped.text.strip()
 
