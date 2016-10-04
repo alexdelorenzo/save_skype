@@ -20,18 +20,27 @@ except ImportError as ex:
 
 # Filename params
 MAX_NAME_LEN = 60
-CHAT_FMT = "chat_%s_%s"
+CHAT_FILENAME_FMT = "chat_%s_%s"
 EXT = ".txt"
 
 # SQL statements
 COL_SQL = "PRAGMA table_info(Messages);"  # grabs column names
 MSG_SQL = "select * from Messages;"
 
+# Format strings
+MSG_FMT = "[%s] %s: %s"
+CHAT_FMT = "<Chat #%s with %s messages by %s>"
+
 
 class Message(namedtuple('Message', 'timestamp user msg')):
     def __str__(self):
         dt = datetime.fromtimestamp(self.timestamp)
-        return '[%s] %s: %s' % (str(dt), str(self.user), str(self.msg))
+
+        return MSG_FMT % (str(dt), str(self.user), str(self.formatted_msg))
+
+    @property
+    def formatted_msg(self) -> str:
+        return format_msg(self.msg)
 
 
 class Chat(namedtuple('Chat', 'users msgs id')):
@@ -48,7 +57,7 @@ class Chat(namedtuple('Chat', 'users msgs id')):
         msgs = len(self.msgs)
         users = ', '.join(self.users)
 
-        return "<Chat #%s with %s messages by %s>" % (chat_id, msgs, users)
+        return CHAT_FMT % (chat_id, msgs, users)
 
     def __hash__(self):
         return hash(str(self)) if self.id is None else self.id
@@ -60,7 +69,7 @@ class Chat(namedtuple('Chat', 'users msgs id')):
         users = '_'.join(self.users)
 
         if not filename:
-            filename = CHAT_FMT % (hash(self), users)
+            filename = CHAT_FILENAME_FMT % (hash(self), users)
 
         filename = filename[:max_length] + EXT
 
