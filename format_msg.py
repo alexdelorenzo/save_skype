@@ -38,7 +38,7 @@ def format_msg(msg: str) -> str:
         part_tags = wrapped.find_all('part')  # part tags hold call info
 
         if part_tags:
-            return '\n'.join(map(get_duration_str, part_tags))
+            return ' '.join(map(get_duration_str, part_tags))
 
         return wrapped.text.strip()
 

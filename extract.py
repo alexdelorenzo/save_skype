@@ -6,7 +6,7 @@ from sqlite3 import connect
 from types import GeneratorType
 from datetime import datetime
 
-from format import format_msg
+from format_msg import format_msg
 
 try:
     import click
@@ -50,7 +50,7 @@ class Chat(namedtuple('Chat', 'users msgs id')):
         return '\n'.join(map(str, self))
 
     def __repr__(self):
-        chat_id = self.id if self.id else '?'
+        chat_id = self.id if self.id is None else '?'
         msgs = len(self.msgs)
         users = ', '.join(self.users)
 
