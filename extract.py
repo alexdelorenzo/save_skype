@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 from collections import namedtuple, defaultdict
 from os import getcwd, chdir
 from sqlite3 import connect
@@ -9,13 +8,11 @@ from datetime import datetime
 
 from format import format_msg
 
-
 try:
     import click
-    import html_wrapper
 
 except ImportError as ex:
-    raise ImportError("Please install click and html_wrapper via pip") from ex
+    raise ImportError("Please install click via pip3") from ex
 
 
 # Filename params

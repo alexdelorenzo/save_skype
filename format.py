@@ -1,4 +1,12 @@
-from html_wrapper import HtmlWrapper
+try:
+    from html_wrapper import HtmlWrapper
+
+except ImportError as ex:
+    raise ImportError("Please install html_wrapper via pip3") from ex
+
+
+SEC_IN_MIN = 60
+MIN_IN_HR = 60
 
 
 def fmt_duration(sec: HtmlWrapper) -> str:
@@ -7,8 +15,8 @@ def fmt_duration(sec: HtmlWrapper) -> str:
 
     sec = int(str(sec))
 
-    m, s = divmod(sec, 60)
-    h, m = divmod(m, 60)
+    m, s = divmod(sec, SEC_IN_MIN)
+    h, m = divmod(m, MIN_IN_HR)
 
     h_str = ('%sh' % h) if h else ''
     m_str = ('%sm' % m) if m else ''
@@ -27,7 +35,7 @@ def format_msg(msg: str) -> str:
 
     if '</' in msg:
         wrapped = HtmlWrapper(msg)
-        part_tags = wrapped.find_all('part')
+        part_tags = wrapped.find_all('part')  # part tags hold call info
 
         if part_tags:
             return '\n'.join(map(get_duration_str, part_tags))
