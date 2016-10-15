@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 from collections import namedtuple, defaultdict
+from datetime import datetime
 from os import getcwd, chdir
 from sqlite3 import connect
 from types import GeneratorType
-from datetime import datetime
 
-from format_msg import format_msg
+from save_skype.format_msg import format_msg
 
 try:
     import click
