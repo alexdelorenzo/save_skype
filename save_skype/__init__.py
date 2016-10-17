@@ -1,1 +1,1 @@
-from save_skype.extract import *
+from .save_skype.extract import *
