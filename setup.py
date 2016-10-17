@@ -4,7 +4,7 @@ with open('requirements.txt', 'r') as file:
     requirements = file.readlines()
 
 setup(name="save_skype",
-      version="0.1.4",
+      version="0.1.5",
       description="Extract and save Skype chats.",
       url="https://github.com/thismachinechills/save_skype",
       author="thismachinechills (Alex)",
