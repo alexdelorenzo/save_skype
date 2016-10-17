@@ -6,7 +6,7 @@ from os import getcwd, chdir
 from sqlite3 import connect
 from types import GeneratorType
 
-from .save_skype.format_msg import format_msg
+from save_skype.format_msg import format_msg
 
 try:
     import click
