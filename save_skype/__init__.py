@@ -1,1 +1,1 @@
-from . extract import *
+from .extract import *
