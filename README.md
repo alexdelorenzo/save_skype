@@ -1,7 +1,5 @@
 # save_skype
-Extract chats from Skype main.db and save them as text files
-
-Python 3 only
+Messages will persist in the Skype app's database even after they're deleted, and this utility will recover them as text files.
 
 ## Installation
 `pip3 install save_skype`
