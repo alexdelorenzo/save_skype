@@ -8,7 +8,7 @@ Or
 
 - Pull the repo
 - Install dependencies w/ pip
-`pip3 install -r requirements.txt && python3 setup.py`
+`pip3 install -r requirements.txt && python3 setup.py install`
 
 
 
