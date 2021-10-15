@@ -73,7 +73,7 @@ class Chat(NamedTuple):
         return iter(self.msgs)
 
     def save(self, filename: Optional[str] = None, max_length: int =
-MAX_NAME_LEN) -> str:
+MAX_NAME_LEN) -> Path:
         users = '_'.join(self.users)
 
         if not filename:
@@ -83,11 +83,11 @@ MAX_NAME_LEN) -> str:
         path = Path(filename)
         path.write_text(str(self))
 
-        return str(path.absolute())
+        return path.absolute()
 
 
-def gen_rows(path: str) -> Iterable['Row']:
-    with connect(path) as connection:
+def gen_rows(path: Path) -> Iterable['Row']:
+    with connect(str(path)) as connection:
         cursor = connection.cursor()
         col_info = cursor.execute(COL_SQL)
         fields = [info[1] for info in col_info.fetchall()]
@@ -99,7 +99,7 @@ def gen_rows(path: str) -> Iterable['Row']:
         yield Row(*row)
 
 
-def get_skype_map(path: str) -> DefaultDict[int, List['Row']]:
+def get_skype_map(path: Path) -> DefaultDict[int, List['Row']]:
     # TODO: just write the SQL that makes all of this unnecessary
     row_gen = gen_rows(path)
     skype_map = defaultdict(list)
@@ -110,7 +110,7 @@ def get_skype_map(path: str) -> DefaultDict[int, List['Row']]:
     return skype_map
 
 
-def gen_skype_chats(path: str) -> Iterable[Chat]:
+def gen_skype_chats(path: Path) -> Iterable[Chat]:
     skype_map = get_skype_map(path)
 
     for chat_id, msgs in skype_map.items():
@@ -129,6 +129,7 @@ def chats_to_files(file: Optional[str] = None, save: str = '.'):
     if not file:
         raise OSError("Skype main.db location not supplied.")
 
+    path = Path(file)
     cwd = getcwd()
 
     # always go back to the current working dir
@@ -136,7 +137,7 @@ def chats_to_files(file: Optional[str] = None, save: str = '.'):
         chdir(save)
 
         file_count = 0
-        for file_count, chat in enumerate(gen_skype_chats(file), start=1):
+        for file_count, chat in enumerate(gen_skype_chats(Path), start=1):
             print(chat.save())
 
         print(f"{file_count} files saved to {save}")
