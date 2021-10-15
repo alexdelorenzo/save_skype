@@ -75,8 +75,7 @@ class Chat(NamedTuple):
     def __iter__(self):
         return iter(self.msgs)
 
-    def save(self, filename: Optional[str] = None, max_length: int =
-MAX_NAME_LEN) -> Path:
+    def save(self, filename: Optional[str] = None, max_length: int = MAX_NAME_LEN) -> Path:
         users = '_'.join(self.users)
 
         if not filename:
