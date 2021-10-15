@@ -110,16 +110,19 @@ def get_skype_map(path: Path) -> DefaultDict[int, List['Row']]:
     return skype_map
 
 
+def get_msg(row: 'Row') -> Message:
+    msg = format_msg(row.body_xml)
+
+    return Message(row.timestamp, row.author, msg)
+
+
 def gen_skype_chats(path: Path) -> Iterable[Chat]:
     skype_map = get_skype_map(path)
 
     for chat_id, msgs in skype_map.items():
-        msg_objs = tuple(
-          Message(row.timestamp, row.author, format_msg(row.body_xml))
-          for row in msgs
-        )
+        msgs = tuple(map(get_msg, msgs))
 
-        yield Chat(msg_objs, chat_id)
+        yield Chat(msgs, chat_id)
 
 
 @click.command()
