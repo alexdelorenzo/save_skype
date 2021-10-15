@@ -31,6 +31,9 @@ CHAT_FMT = "<Chat #%s with %s messages by %s>"
 DEFAULT_CHAT_ID = "?"
 
 
+ChatRows = DefaultDict[int, List['Row']]
+
+
 class Message(NamedTuple):
     timestamp: str
     user: str
@@ -99,15 +102,15 @@ def gen_rows(path: Path) -> Iterable['Row']:
         yield Row(*row)
 
 
-def get_skype_map(path: Path) -> DefaultDict[int, List['Row']]:
+def get_chat_rows(path: Path) -> ChatRows
     # TODO: just write the SQL that makes all of this unnecessary
     row_gen = gen_rows(path)
-    skype_map = defaultdict(list)
+    chat_rows = defaultdict(list)
 
     for row in row_gen:
-        skype_map[row.convo_id].append(row)
+        chat_rows[row.convo_id].append(row)
 
-    return skype_map
+    return chat_rows
 
 
 def get_msg(row: 'Row') -> Message:
@@ -117,10 +120,10 @@ def get_msg(row: 'Row') -> Message:
 
 
 def gen_skype_chats(path: Path) -> Iterable[Chat]:
-    skype_map = get_skype_map(path)
+    chat_rows = get_chat_rows(path)
 
-    for chat_id, msgs in skype_map.items():
-        msgs = tuple(map(get_msg, msgs))
+    for chat_id, rows in chat_rows.items():
+        msgs = tuple(map(get_msg, rows))
 
         yield Chat(msgs, chat_id)
 
@@ -140,7 +143,9 @@ def chats_to_files(file: Optional[str] = None, save: str = '.'):
         chdir(save)
 
         file_count = 0
-        for file_count, chat in enumerate(gen_skype_chats(Path), start=1):
+        chats = gen_skype_chats(path)
+
+        for file_count, chat in enumerate(chats, start=1):
             print(chat.save())
 
         print(f"{file_count} files saved to {save}")
