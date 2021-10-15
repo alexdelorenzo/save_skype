@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-
+from typing import NamedTuple, Dict, DefaultDict, Iterable, \
+  List, Tuple, Optional
 from collections import namedtuple, defaultdict
+from pathlib import Path
 from datetime import datetime
 from os import getcwd, chdir
 from sqlite3 import connect
-from types import GeneratorType
 
 from save_skype.format_msg import format_msg
 
@@ -30,7 +31,11 @@ CHAT_FMT = "<Chat #%s with %s messages by %s>"
 DEFAULT_CHAT_ID = "?"
 
 
-class Message(namedtuple('Message', 'timestamp user msg')):
+class Message(NamedTuple):
+    timestamp: str
+    user: str
+    msg: str
+
     def __str__(self):
         dt = datetime.fromtimestamp(self.timestamp)
 
@@ -41,9 +46,13 @@ class Message(namedtuple('Message', 'timestamp user msg')):
         return format_msg(self.msg)
 
 
-class Chat(namedtuple('Chat', 'users msgs id')):
-    def __new__(cls, msgs: tuple, id: int=None):
-        users = sorted({msg.user for msg in msgs})
+class Chat(NamedTuple):
+    users: Tuple[str]
+    msgs: Tuple[Message]
+    id: int
+
+    def __new__(cls, msgs: Tuple[Message], id: Optional[int] = None):
+        users = tuple(sorted({msg.user for msg in msgs}))
 
         return super().__new__(cls, users, msgs, id)
 
@@ -63,21 +72,21 @@ class Chat(namedtuple('Chat', 'users msgs id')):
     def __iter__(self):
         return iter(self.msgs)
 
-    def save(self, filename: str=None, max_length: int=MAX_NAME_LEN) -> str:
+    def save(self, filename: Optional[str] = None, max_length: int =
+MAX_NAME_LEN) -> str:
         users = '_'.join(self.users)
 
         if not filename:
             filename = CHAT_FILENAME_FMT % (hash(self), users)
 
         filename = filename[:max_length] + EXT
+        path = Path(filename)
+        path.write_text(str(self))
 
-        with open(filename, 'w') as file:
-            file.write(str(self))
-
-        return filename
+        return str(path.absolute())
 
 
-def gen_rows(path: str) -> GeneratorType:
+def gen_rows(path: str) -> Iterable['Row']:
     with connect(path) as connection:
         cursor = connection.cursor()
         col_info = cursor.execute(COL_SQL)
@@ -90,7 +99,7 @@ def gen_rows(path: str) -> GeneratorType:
         yield Row(*row)
 
 
-def get_skype_map(path: str) -> defaultdict:
+def get_skype_map(path: str) -> DefaultDict[int, List['Row']]:
     # TODO: just write the SQL that makes all of this unnecessary
     row_gen = gen_rows(path)
     skype_map = defaultdict(list)
@@ -101,12 +110,14 @@ def get_skype_map(path: str) -> defaultdict:
     return skype_map
 
 
-def gen_skype_chats(path: str) -> GeneratorType:
+def gen_skype_chats(path: str) -> Iterable[Chat]:
     skype_map = get_skype_map(path)
 
     for chat_id, msgs in skype_map.items():
-        msg_objs = tuple(Message(row.timestamp, row.author, format_msg(row.body_xml))
-                         for row in msgs)
+        msg_objs = tuple(
+          Message(row.timestamp, row.author, format_msg(row.body_xml))
+          for row in msgs
+        )
 
         yield Chat(msg_objs, chat_id)
 
@@ -114,13 +125,13 @@ def gen_skype_chats(path: str) -> GeneratorType:
 @click.command()
 @click.option("-s", "--save", default='.', help="Path to save chats")
 @click.argument("file")
-def chats_to_files(file: str=None, save: str='.'):
+def chats_to_files(file: Optional[str] = None, save: str = '.'):
     if not file:
         raise OSError("Skype main.db location not supplied.")
 
     cwd = getcwd()
 
-    # ALWAYS go back to the current working dir
+    # always go back to the current working dir
     try:
         chdir(save)
 
@@ -128,7 +139,7 @@ def chats_to_files(file: str=None, save: str='.'):
         for file_count, chat in enumerate(gen_skype_chats(file), start=1):
             print(chat.save())
 
-        print("%s files saved to %s" % (file_count, save))
+        print(f"{file_count} files saved to {save}")
 
     finally:
         chdir(cwd)
