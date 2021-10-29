@@ -4,13 +4,14 @@ try:
     from html_wrapper import HtmlWrapper
 
 except ImportError as ex:
-    raise ImportError("Please install html_wrapper via pip3") from ex
+    raise ImportError("Please install html_wrapper via pip.") from ex
 
 
 SEC_IN_MIN = 60
 MIN_IN_HR = 60
 NO_MSG_CONTENT = "<NO_MESSAGE_CONTENT>"
 UNITS = 'hms'
+
 
 def fmt_duration(sec: Optional[HtmlWrapper]) -> str:
     if sec is None:
